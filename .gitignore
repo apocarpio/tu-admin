@@ -1,0 +1,20 @@
+# Credenziali e configurazioni sensibili
+.db_credentials
+.tu_app_path
+
+# Backup SQL
+*.sql
+
+# File di log
+*.log
+
+# Backup degli script
+*.BAK
+*.BAK2
+*.backup.*
+
+# Altri file temporanei
+MySQLTuner/
+fix.sh
+tuadmin_fixed.sh
+tuadmin_working.sh
