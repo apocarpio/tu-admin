@@ -49,3 +49,6 @@ data/*
 # DIRECTORIES À PRÉSERVER VIDES
 # ═══════════════════════════════════════════════════════════
 !*/.gitkeep
+.db_credentials
+.tu_app_path
+.claude/

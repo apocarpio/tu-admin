@@ -1,5 +1,5 @@
 #!/bin/bash
-# Module TU Tools - Gestion Terminal Urgence (À COMPLÉTER)
+# Module TU Tools - Loader principal
 
 # Chargement des dépendances
 SCRIPT_MODULE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -7,16 +7,16 @@ source "$SCRIPT_MODULE_DIR/../lib/common.sh"
 source "$SCRIPT_MODULE_DIR/../lib/ui.sh"
 source "$SCRIPT_MODULE_DIR/../lib/database.sh"
 
-# Fonction menu TU Tools (temporaire)
-menu_tu_tools() {
-    show_header
-    print_message "warning" "Module TU TOOLS en cours de migration..."
-    echo ""
-    echo -e "${COLOR_YELLOW}Ce module sera complété prochainement.${COLOR_RESET}"
-    echo -e "${COLOR_CYAN}Pour l'instant, utilisez le script original.${COLOR_RESET}"
-    echo ""
-    pause_with_message
-}
+# Chargement des sous-modules TU Tools
+TU_TOOLS_DIR="$SCRIPT_MODULE_DIR/tu-tools"
 
-# Export des fonctions
+# Charger tous les sous-modules
+for module in "$TU_TOOLS_DIR"/*.sh; do
+    if [[ -f "$module" ]]; then
+        source "$module"
+        log_message "DEBUG" "Sous-module TU Tools chargé: $(basename $module)"
+    fi
+done
+
+# Export de la fonction principale
 export -f menu_tu_tools

@@ -1,81 +1,73 @@
 #!/bin/bash
-# Bibliothèque Database pour TU Admin
-# Fonctions communes de gestion base de données
+# Bibliothèque Database - Fonctions de gestion base de données
+# Auteur: Simone MUREDDU pour iesS
+# Description: Gestion complète des opérations base de données pour TU Admin
 
 # Chargement des dépendances
-SCRIPT_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_LIB_DIR/common.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../config/colors.conf"
 
-# Variables globales DB (chargées depuis config)
-DB_HOST=""
-DB_DATABASE=""
-DB_USER=""
-DB_PASSWORD=""
-
-# Fonction de cryptage simple (Base64)
-encrypt_string() {
-    local input="$1"
-    echo -n "$input" | base64 -w 0
-}
-
-# Fonction de décryptage simple
-decrypt_string() {
-    local input="$1"
-    echo -n "$input" | base64 -d 2>/dev/null || echo ""
-}
-
-# Fonction pour sauvegarder les credentials
+# Fonction pour sauvegarder les credentials (port optionnel, défaut 3306)
 save_db_credentials() {
     local host="$1"
     local database="$2"
     local user="$3"
     local password="$4"
-    
-    local cred_file="${DATA_DIR}/.db_credentials"
+    local port="${5:-3306}"
 
     {
         echo "HOST=$(encrypt_string "$host")"
         echo "DATABASE=$(encrypt_string "$database")"
         echo "USER=$(encrypt_string "$user")"
         echo "PASSWORD=$(encrypt_string "$password")"
+        echo "PORT=$(encrypt_string "$port")"
         echo "CONFIGURED=true"
-    } > "$cred_file"
+    } > "$DB_CREDENTIALS_FILE"
 
-    chmod 600 "$cred_file"
-    print_message "success" "Credentials sauvegardées avec succès!"
+    chmod 600 "$DB_CREDENTIALS_FILE"
+    echo -e "${GREEN}✅ Credentials sauvegardées avec succès!${NC}"
 }
 
 # Fonction pour charger les credentials
 load_db_credentials() {
-    local cred_file="${DATA_DIR}/.db_credentials"
-    
-    if [[ -f "$cred_file" ]]; then
-        source "$cred_file"
+    if [[ -f "$DB_CREDENTIALS_FILE" ]]; then
+        source "$DB_CREDENTIALS_FILE"
         if [[ "$CONFIGURED" == "true" ]]; then
             DB_HOST=$(decrypt_string "$HOST")
             DB_DATABASE=$(decrypt_string "$DATABASE")
             DB_USER=$(decrypt_string "$USER")
             DB_PASSWORD=$(decrypt_string "$PASSWORD")
+            # Compatibilità backward: se PORT non presente, default 3306
+            DB_PORT=""
+            if [[ -n "$PORT" ]]; then
+                DB_PORT=$(decrypt_string "$PORT")
+            fi
+            [[ -z "$DB_PORT" ]] && DB_PORT="3306"
+            export DB_PORT
             return 0
         fi
     fi
     return 1
 }
 
-# Fonction pour tester la connexion DB silencieusement
+# Helper: opzione porta per comandi mysql
+_mysql_port_opt() {
+    if [[ -n "$DB_PORT" && "$DB_PORT" != "3306" ]]; then
+        echo "-P $DB_PORT"
+    fi
+}
+
+# Fonction test connexion silencieuse
 test_db_connection_silent() {
-    # Vérifier que les paramètres de connexion sont définis
     if [[ -z "$DB_HOST" || -z "$DB_USER" || -z "$DB_PASSWORD" || -z "$DB_DATABASE" ]]; then
         return 1
     fi
 
-    # Vérifier que mysql est disponible
     if ! command -v mysql &> /dev/null; then
         return 1
     fi
 
-    # Test de connexion silencieux
-    if mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" -e "SELECT 1;" "$DB_DATABASE" &>/dev/null; then
+    local port_opt=$(_mysql_port_opt)
+    if mysql -h "$DB_HOST" $port_opt -u "$DB_USER" -p"$DB_PASSWORD" -e "SELECT 1;" "$DB_DATABASE" &>/dev/null; then
         return 0
     else
         return 1
@@ -96,14 +88,14 @@ calculate_table_size() {
         return 1
     fi
 
-    # Query pour obtenir taille et nombre de lignes
+    local port_opt=$(_mysql_port_opt)
     local query="SELECT
         ROUND(((data_length + index_length) / 1024 / 1024), 2),
         table_rows
     FROM information_schema.tables
     WHERE table_schema = '$DB_DATABASE' AND table_name = '$table_name';"
 
-    local result=$(mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" -sN -e "$query" 2>/dev/null)
+    local result=$(mysql -h "$DB_HOST" $port_opt -u "$DB_USER" -p"$DB_PASSWORD" -sN -e "$query" 2>/dev/null)
 
     if [[ -n "$result" && "$result" != "NULL	NULL" ]]; then
         local size_mb=$(echo "$result" | awk '{print $1}')
@@ -134,7 +126,8 @@ get_database_total_size() {
         return 1
     fi
 
-    local total_size=$(mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" -sN -e "
+    local port_opt=$(_mysql_port_opt)
+    local total_size=$(mysql -h "$DB_HOST" $port_opt -u "$DB_USER" -p"$DB_PASSWORD" -sN -e "
         SELECT ROUND(SUM((data_length + index_length) / 1024 / 1024), 2) as total_mb
         FROM information_schema.tables
         WHERE table_schema = '$DB_DATABASE';" 2>/dev/null)
@@ -156,11 +149,10 @@ get_disk_usage() {
     fi
 }
 
-# Export des fonctions
-export -f encrypt_string
-export -f decrypt_string
+# Export fonctions
 export -f save_db_credentials
 export -f load_db_credentials
+export -f _mysql_port_opt
 export -f test_db_connection_silent
 export -f calculate_table_size
 export -f get_database_total_size
