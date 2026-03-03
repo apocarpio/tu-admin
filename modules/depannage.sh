@@ -497,7 +497,7 @@ _scan_logs_system() {
     # Logs compressés et rotated (sans journald, compté séparément cat.7)
     find /var/log -type f \( -name "*.gz" -o -name "*.old" -o -name "*.[0-9]" \) \
         -not -path "*/journal/*" -not -path "*/apache2/*" -not -path "*/nginx/*" \
-        2>/dev/null | xargs du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}'
+        2>/dev/null | xargs --no-run-if-empty du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}'
 }
 
 # Scanner cache APT
@@ -508,9 +508,9 @@ _scan_cache_apt() {
 # Scanner fichiers temporaires > 7 jours
 _scan_tmp_files() {
     local total=0
-    local tmp_size=$(find /tmp -type f -atime +7 2>/dev/null | xargs du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}')
+    local tmp_size=$(find /tmp -type f -atime +7 2>/dev/null | xargs --no-run-if-empty du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}')
     total=$((total + tmp_size))
-    local vartmp_size=$(find /var/tmp -type f -atime +7 2>/dev/null | xargs du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}')
+    local vartmp_size=$(find /var/tmp -type f -atime +7 2>/dev/null | xargs --no-run-if-empty du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}')
     total=$((total + vartmp_size))
     echo "$total"
 }
@@ -528,11 +528,11 @@ _scan_old_kernels() {
 _scan_logs_web() {
     local total=0
     if [[ -d /var/log/apache2 ]]; then
-        local apache_gz=$(find /var/log/apache2 -name "*.gz" -o -name "*.old" -o -name "*.[0-9]" 2>/dev/null | xargs du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}')
+        local apache_gz=$(find /var/log/apache2 -name "*.gz" -o -name "*.old" -o -name "*.[0-9]" 2>/dev/null | xargs --no-run-if-empty du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}')
         total=$((total + apache_gz))
     fi
     if [[ -d /var/log/nginx ]]; then
-        local nginx_gz=$(find /var/log/nginx -name "*.gz" -o -name "*.old" -o -name "*.[0-9]" 2>/dev/null | xargs du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}')
+        local nginx_gz=$(find /var/log/nginx -name "*.gz" -o -name "*.old" -o -name "*.[0-9]" 2>/dev/null | xargs --no-run-if-empty du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}')
         total=$((total + nginx_gz))
     fi
     echo "$total"
@@ -542,7 +542,7 @@ _scan_logs_web() {
 _scan_crash_files() {
     local total=0
     # Core dumps (seulement fichiers > 1MB pour éviter faux positifs)
-    local cores=$(find /tmp /var/tmp /home /root -maxdepth 2 -type f \( -name "core" -o -name "core.[0-9]*" \) -size +1M 2>/dev/null | xargs du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}')
+    local cores=$(find /tmp /var/tmp /home /root -maxdepth 2 -type f \( -name "core" -o -name "core.[0-9]*" \) -size +1M 2>/dev/null | xargs --no-run-if-empty du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}')
     total=$((total + cores))
     # Crash reports
     if [[ -d /var/crash ]]; then
@@ -878,7 +878,7 @@ show_large_files() {
 
     local count=0
     find "$search_path" -xdev -type f -size +100M 2>/dev/null | \
-        xargs du -sh 2>/dev/null | sort -rh | head -20 | while read size filepath; do
+        xargs --no-run-if-empty du -sh 2>/dev/null | sort -rh | head -20 | while read size filepath; do
         local color="${YELLOW}"
         # Colorer en rouge si > 1G
         if echo "$size" | grep -q "G"; then
