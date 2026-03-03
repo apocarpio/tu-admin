@@ -31,6 +31,7 @@ source "$SCRIPT_DIR/modules/tu-tools/services.sh"
 source "$SCRIPT_DIR/modules/tu-tools/menu.sh"
 
 # Chargement des modules principaux
+source "$SCRIPT_DIR/modules/depannage.sh"
 source "$SCRIPT_DIR/modules/system.sh"
 source "$SCRIPT_DIR/modules/network.sh"
 source "$SCRIPT_DIR/modules/logs.sh"
@@ -43,9 +44,10 @@ show_main_menu() {
    echo -e "${WHITE}│                      MENU PRINCIPAL                         │${NC}"
    echo -e "${WHITE}├─────────────────────────────────────────────────────────────┤${NC}"
    echo -e "${WHITE}│  ${PURPLE}1. TU TOOLS     ${WHITE}│ Gestion base de données et maintenance   │${NC}"
-   echo -e "${WHITE}│  ${CYAN}2. Système      ${WHITE}│ Informations système et performance      │${NC}"
-   echo -e "${WHITE}│  ${CYAN}3. Réseau       ${WHITE}│ Configuration et outils réseau           │${NC}"
-   echo -e "${WHITE}│  ${CYAN}4. Logs         ${WHITE}│ Consultation des logs système            │${NC}"
+   echo -e "${WHITE}│  ${YELLOW}2. Dépannage    ${WHITE}│ Diagnostic et résolution rapide           │${NC}"
+   echo -e "${WHITE}│  ${CYAN}3. Système      ${WHITE}│ Informations système et performance      │${NC}"
+   echo -e "${WHITE}│  ${CYAN}4. Réseau       ${WHITE}│ Configuration et outils réseau           │${NC}"
+   echo -e "${WHITE}│  ${CYAN}5. Logs         ${WHITE}│ Consultation des logs système            │${NC}"
    echo -e "${WHITE}├─────────────────────────────────────────────────────────────┤${NC}"
    echo -e "${WHITE}│  ${RED}0. Quitter      ${WHITE}│ Sortir de l'application                  │${NC}"
    echo -e "${WHITE}└─────────────────────────────────────────────────────────────┘${NC}"
@@ -75,7 +77,7 @@ main() {
         show_main_menu
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [0-4]: ${NC})" choice
+        read -p "$(echo -e ${CYAN}Sélectionnez une option [0-5]: ${NC})" choice
 
         case "$choice" in
             1)
@@ -109,12 +111,15 @@ main() {
                 fi
                 ;;
             2)
-                menu_system
+                menu_depannage
                 ;;
             3)
-                menu_network
+                menu_system
                 ;;
             4)
+                menu_network
+                ;;
+            5)
                 menu_logs
                 ;;
             0)

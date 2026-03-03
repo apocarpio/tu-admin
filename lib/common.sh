@@ -197,9 +197,12 @@ format_menu_row() {
     local right_len=${#right_clean}
     
     # Calcola spazi necessari
-    # total_width - 2 (bordi) - 2 (spazi interni) - left_len - right_len
-    local spaces_needed=$((total_width - 4 - left_len - right_len))
+    # total_width (inner) - 2 (spazi sx) - 1 (spazio dx) - left_len - right_len
+    local spaces_needed=$((total_width - 3 - left_len - right_len))
     
+    # Protezione: minimo 0 spazi
+    [[ $spaces_needed -lt 0 ]] && spaces_needed=0
+
     # Crea gli spazi
     local spaces=$(printf '%*s' "$spaces_needed" '')
     
