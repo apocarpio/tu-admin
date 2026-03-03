@@ -494,18 +494,10 @@ _format_size_kb() {
 
 # Scanner la taille des logs système nettoyables
 _scan_logs_system() {
-    local total=0
-    # Logs compressés (rotated)
-    local gz_size=$(find /var/log -name "*.gz" -o -name "*.old" -o -name "*.[0-9]" 2>/dev/null | xargs du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}')
-    total=$((total + gz_size))
-    # Journal systemd > 3 jours
-    local journal_size=$(journalctl --disk-usage 2>/dev/null | grep -oP '[0-9.]+[MG]' | head -1)
-    if [[ "$journal_size" =~ ([0-9.]+)G ]]; then
-        total=$((total + ${BASH_REMATCH[1]%.*} * 1048576))
-    elif [[ "$journal_size" =~ ([0-9.]+)M ]]; then
-        total=$((total + ${BASH_REMATCH[1]%.*} * 1024))
-    fi
-    echo "$total"
+    # Logs compressés et rotated (sans journald, compté séparément cat.7)
+    find /var/log -type f \( -name "*.gz" -o -name "*.old" -o -name "*.[0-9]" \) \
+        -not -path "*/journal/*" -not -path "*/apache2/*" -not -path "*/nginx/*" \
+        2>/dev/null | xargs du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}'
 }
 
 # Scanner cache APT
@@ -526,8 +518,10 @@ _scan_tmp_files() {
 # Scanner anciens kernels
 _scan_old_kernels() {
     local current_kernel=$(uname -r)
-    dpkg -l 'linux-image-*' 2>/dev/null | grep "^ii" | grep -v "$current_kernel" | grep -v "meta" | awk '{print $2}' | \
-        xargs dpkg -L 2>/dev/null | xargs du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}'
+    # Utiliser dpkg-query Installed-Size (en KB) pour éviter le double comptage
+    dpkg-query -W -f='${Package} ${Installed-Size}\n' 'linux-image-*' 2>/dev/null | \
+        grep -v "$current_kernel" | grep -v "meta" | \
+        awk '{sum+=$2} END{print sum+0}'
 }
 
 # Scanner logs Apache/Nginx
@@ -547,8 +541,8 @@ _scan_logs_web() {
 # Scanner les gros fichiers inutiles (core dumps, crash reports)
 _scan_crash_files() {
     local total=0
-    # Core dumps
-    local cores=$(find / -maxdepth 3 -name "core" -o -name "core.*" -o -name "*.core" 2>/dev/null | xargs du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}')
+    # Core dumps (seulement fichiers > 1MB pour éviter faux positifs)
+    local cores=$(find /tmp /var/tmp /home /root -maxdepth 2 -type f \( -name "core" -o -name "core.[0-9]*" \) -size +1M 2>/dev/null | xargs du -sk 2>/dev/null | awk '{sum+=$1} END{print sum+0}')
     total=$((total + cores))
     # Crash reports
     if [[ -d /var/crash ]]; then
