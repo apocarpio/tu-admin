@@ -21,7 +21,7 @@ list_large_files() {
     fi
     echo ""
 
-    read -p "$(echo -e ${CYAN}Choix [1-7]: ${NC})" dir_choice
+    read -p "$(echo -e "${CYAN}Choix [1-7]: ${NC}")" dir_choice
 
     local search_path=""
     case "$dir_choice" in
@@ -31,7 +31,7 @@ list_large_files() {
         4) search_path="/usr" ;;
         5) search_path="/" ;;
         6)
-            read -p "$(echo -e ${CYAN}Chemin personnalisé: ${NC})" search_path
+            read -p "$(echo -e "${CYAN}Chemin personnalisé: ${NC}")" search_path
             ;;
         7)
             if [[ -n "$TU_APP_PATH" ]]; then
@@ -179,7 +179,7 @@ menu_disk_problems() {
         echo -e "${WHITE}└─────────────────────────────────────────────────────────────┘${NC}"
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [0-2]: ${NC})" choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option [0-2]: ${NC}")" choice
 
         case "$choice" in
             1) 

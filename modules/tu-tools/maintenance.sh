@@ -7,7 +7,7 @@ optimize_patients_editions() {
     echo -e "${WHITE}OPTIMISATION TABLE PATIENTS_EDITIONS${NC}"
     echo ""
     echo -e "${RED}⚠️  Cette opération peut prendre du temps et bloquer la table!${NC}"
-    read -p "$(echo -e ${YELLOW}Continuer? [o/N]: ${NC})" confirm
+    read -p "$(echo -e "${YELLOW}Continuer? [o/N]: ${NC}")" confirm
 
     if [[ "$confirm" =~ ^[Oo]$ ]]; then
         echo -e "${YELLOW}Optimisation en cours...${NC}"
@@ -74,7 +74,7 @@ purge_patients_messages() {
     echo -e "${GREEN}   Espace qui sera libéré: $size_mb MB${NC}"
     echo ""
 
-    read -p "$(echo -e ${RED}Êtes-vous sûr de vouloir vider la table patients_messages? [oui/NON]: ${NC})" confirm
+    read -p "$(echo -e "${RED}Êtes-vous sûr de vouloir vider la table patients_messages? [oui/NON]: ${NC}")" confirm
 
     if [[ "$confirm" == "oui" ]]; then
         echo ""
@@ -140,7 +140,7 @@ purge_logs() {
     echo -e "${GREEN}   Espace qui sera libéré: $size_mb MB${NC}"
     echo ""
 
-    read -p "$(echo -e ${RED}Êtes-vous sûr de vouloir vider la table logs? [oui/NON]: ${NC})" confirm
+    read -p "$(echo -e "${RED}Êtes-vous sûr de vouloir vider la table logs? [oui/NON]: ${NC}")" confirm
 
     if [[ "$confirm" == "oui" ]]; then
         echo ""
@@ -199,7 +199,7 @@ check_database() {
     done
 
     echo ""
-    read -p "$(echo -e ${YELLOW}Entrez le nom de la base à vérifier [ou ENTER pour la base configurée]: ${NC})" target_db
+    read -p "$(echo -e "${YELLOW}Entrez le nom de la base à vérifier [ou ENTER pour la base configurée]: ${NC}")" target_db
 
     if [[ -z "$target_db" ]]; then
         target_db="$DB_DATABASE"
@@ -395,7 +395,7 @@ view_mariadb_logs() {
         echo -e "${WHITE}└────────────────────────────────────────────────────────────┘${NC}"
         echo ""
 
-        read -p "$(echo -e ${CYAN}Votre choix: ${NC})" choice
+        read -p "$(echo -e "${CYAN}Votre choix: ${NC}")" choice
 
         case "$choice" in
             [1-9])
@@ -658,7 +658,7 @@ menu_operations_sensibles() {
         echo ""
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [0-8]: ${NC})" choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option [0-8]: ${NC}")" choice
 
         case "$choice" in
             1) backup_database ;;

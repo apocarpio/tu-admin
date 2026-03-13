@@ -64,7 +64,7 @@ show_tu_logs() {
         echo -e "${WHITE}0.${NC} Retour"
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [0-7]: ${NC})" log_choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option [0-7]: ${NC}")" log_choice
 
         case "$log_choice" in
             1)
@@ -124,7 +124,7 @@ show_tu_logs() {
             4)
                 echo -e "${GREEN}═══ FICHIER COMPLET ═══${NC}"
                 echo -e "${YELLOW}⚠️  Fichier de ${line_count} lignes${NC}"
-                read -p "$(echo -e ${CYAN}Confirmer l affichage complet? [o/N]: ${NC})" confirm
+                read -p "$(echo -e "${CYAN}Confirmer l affichage complet? [o/N]: ${NC}")" confirm
                 if [[ "$confirm" =~ ^[Oo]$ ]]; then
                     cat "$log_file" | while IFS= read -r line; do
                         if [[ "$line" =~ \[ERROR\] ]] || [[ "$line" =~ \[FATAL\] ]]; then
@@ -142,7 +142,7 @@ show_tu_logs() {
                 fi
                 ;;
             5)
-                read -p "$(echo -e ${CYAN}Terme à rechercher: ${NC})" search_term
+                read -p "$(echo -e "${CYAN}Terme à rechercher: ${NC}")" search_term
                 if [[ -n "$search_term" ]]; then
                     echo -e "${GREEN}═══ RÉSULTATS RECHERCHE: '$search_term' ═══${NC}"
                     grep -i --color=always "$search_term" "$log_file" || echo -e "${YELLOW}Aucun résultat trouvé${NC}"
@@ -173,7 +173,7 @@ show_tu_logs() {
                 ;;
             7)
                 echo -e "${RED}⚠️  ATTENTION: Cette opération va vider complètement le fichier de log!${NC}"
-                read -p "$(echo -e ${YELLOW}Confirmer la suppression? [o/N]: ${NC})" confirm_clear
+                read -p "$(echo -e "${YELLOW}Confirmer la suppression? [o/N]: ${NC}")" confirm_clear
                 if [[ "$confirm_clear" =~ ^[Oo]$ ]]; then
                     if > "$log_file" 2>/dev/null; then
                         echo -e "${GREEN}✅ Fichier de log vidé avec succès${NC}"

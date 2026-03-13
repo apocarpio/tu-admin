@@ -19,7 +19,7 @@ decrypt_string() {
 # Fonction pause
 pause_any_key() {
     local message="${1:-Appuyez sur Entrée pour continuer...}"
-    read -p "$(echo -e ${GREEN}$message${NC})" dummy
+    read -p "$(echo -e "${GREEN}$message${NC}")" dummy
 }
 
 # Fonction de logging

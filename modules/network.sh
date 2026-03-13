@@ -65,7 +65,7 @@ test_internet_speed() {
         echo -e "${WHITE}4.${NC} Tests de base seulement"
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez [1-4]: ${NC})" speedtest_choice
+        read -p "$(echo -e "${CYAN}Sélectionnez [1-4]: ${NC}")" speedtest_choice
 
         case "$speedtest_choice" in
             1)
@@ -94,7 +94,7 @@ test_internet_speed() {
                 if [[ -n "$servers" ]]; then
                     echo "$servers"
                     echo ""
-                    read -p "$(echo -e ${CYAN}ID du serveur (ou ENTER pour automatique): ${NC})" server_id
+                    read -p "$(echo -e "${CYAN}ID du serveur (ou ENTER pour automatique): ${NC}")" server_id
 
                     if [[ -n "$server_id" ]]; then
                         echo -e "${YELLOW}📊 Test avec serveur $server_id...${NC}"
@@ -551,7 +551,7 @@ menu_network() {
         echo -e "${WHITE}└─────────────────────────────────────────────────────────────┘${NC}"
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [0-6]: ${NC})" choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option [0-6]: ${NC}")" choice
 
         case "$choice" in
             1) test_internet_speed ;;

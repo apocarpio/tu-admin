@@ -39,7 +39,7 @@ configure_tu_app_path() {
     echo -e "${WHITE}3.${NC} Chemin personnalisé"
     echo ""
 
-    read -p "$(echo -e ${CYAN}Sélectionnez une option [1-3] ou tapez le chemin directement: ${NC})" path_choice
+    read -p "$(echo -e "${CYAN}Sélectionnez une option [1-3] ou tapez le chemin directement: ${NC}")" path_choice
 
     case "$path_choice" in
         1)
@@ -49,7 +49,7 @@ configure_tu_app_path() {
             app_path="/home/www/"
             ;;
         3)
-            read -p "$(echo -e ${CYAN}Chemin personnalisé: ${NC})" app_path
+            read -p "$(echo -e "${CYAN}Chemin personnalisé: ${NC}")" app_path
             ;;
         *)
             # Si l'utilisateur tape directement un chemin
@@ -87,7 +87,7 @@ configure_tu_app_path() {
         fi
     else
         echo -e "${YELLOW}⚠️  Répertoire non existant${NC}"
-        read -p "$(echo -e ${CYAN}Créer le répertoire? [O/n]: ${NC})" create_dir
+        read -p "$(echo -e "${CYAN}Créer le répertoire? [O/n]: ${NC}")" create_dir
 
         if [[ ! "$create_dir" =~ ^[Nn]$ ]]; then
             if mkdir -p "$app_path" 2>/dev/null; then
@@ -104,7 +104,7 @@ configure_tu_app_path() {
     fi
 
     echo ""
-    read -p "$(echo -e ${CYAN}Confirmer ce chemin? [O/n]: ${NC})" confirm
+    read -p "$(echo -e "${CYAN}Confirmer ce chemin? [O/n]: ${NC}")" confirm
 
     if [[ ! "$confirm" =~ ^[Nn]$ ]]; then
         save_tu_app_path "$app_path"
@@ -203,12 +203,12 @@ configure_database() {
         echo -e "${WHITE}2.${NC} Lire depuis define.xml.php ${CYAN}(chemin personnalisé)${NC}"
         echo -e "${WHITE}3.${NC} Configuration manuelle ${YELLOW}(serveur externe / cluster)${NC}"
         echo ""
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [1-3]: ${NC})" config_choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option [1-3]: ${NC}")" config_choice
     else
         echo -e "${WHITE}1.${NC} Lire depuis define.xml.php ${CYAN}(chemin personnalisé)${NC}"
         echo -e "${WHITE}2.${NC} Configuration manuelle ${YELLOW}(serveur externe / cluster)${NC}"
         echo ""
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [1-2]: ${NC})" config_choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option [1-2]: ${NC}")" config_choice
         # Décaler les choix si TU_APP_PATH non défini
         [[ "$config_choice" == "1" ]] && config_choice="2"
         [[ "$config_choice" == "2" ]] && config_choice="3"
@@ -232,7 +232,7 @@ configure_database() {
             echo -e "${CYAN}Indiquez le chemin complet vers le fichier define.xml.php${NC}"
             echo -e "${YELLOW}Exemple: /var/www/html/tu-app/src/terminal/var/define.xml.php${NC}"
             echo ""
-            read -p "$(echo -e ${CYAN}Chemin define.xml.php: ${NC})" custom_define_path
+            read -p "$(echo -e "${CYAN}Chemin define.xml.php: ${NC}")" custom_define_path
 
             if [[ -z "$custom_define_path" ]]; then
                 echo -e "${RED}❌ Chemin vide${NC}"
@@ -261,12 +261,12 @@ configure_database() {
     echo -e "${YELLOW}Exemples d'hôte: localhost, 192.168.1.100, db.monserveur.fr${NC}"
     echo ""
 
-    read -p "$(echo -e ${CYAN}Hôte: ${NC})" db_host
-    read -p "$(echo -e ${CYAN}Port MySQL [3306]: ${NC})" db_port
+    read -p "$(echo -e "${CYAN}Hôte: ${NC}")" db_host
+    read -p "$(echo -e "${CYAN}Port MySQL [3306]: ${NC}")" db_port
     db_port="${db_port:-3306}"
-    read -p "$(echo -e ${CYAN}Nom de la base de données: ${NC})" db_name
-    read -p "$(echo -e ${CYAN}Utilisateur: ${NC})" db_user
-    read -s -p "$(echo -e ${CYAN}Mot de passe: ${NC})" db_password
+    read -p "$(echo -e "${CYAN}Nom de la base de données: ${NC}")" db_name
+    read -p "$(echo -e "${CYAN}Utilisateur: ${NC}")" db_user
+    read -s -p "$(echo -e "${CYAN}Mot de passe: ${NC}")" db_password
     echo ""
     echo ""
 
@@ -315,7 +315,7 @@ check_database_configuration() {
 
     # Se tutto fallisce, chiediamo la configurazione manuale
     echo -e "${YELLOW}⚠️  Configuration base de données requise!${NC}"
-    read -p "$(echo -e ${CYAN}Configurer maintenant? [O/n]: ${NC})" configure_now
+    read -p "$(echo -e "${CYAN}Configurer maintenant? [O/n]: ${NC}")" configure_now
 
     if [[ ! "$configure_now" =~ ^[Nn]$ ]]; then
         configure_database

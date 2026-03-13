@@ -167,7 +167,7 @@ menu_hl7_management() {
             echo -e "${WHITE}│  ${RED}0. Retour                                                │${NC}"
             echo -e "${WHITE}└─────────────────────────────────────────────────────────────┘${NC}"
             echo ""
-            read -p "$(echo -e ${CYAN}Sélectionnez une option: ${NC})" choice
+            read -p "$(echo -e "${CYAN}Sélectionnez une option: ${NC}")" choice
             [[ "$choice" == "0" ]] && break
             continue
         fi
@@ -202,7 +202,7 @@ menu_hl7_management() {
         echo -e "${CYAN}  (Entrez le numéro d'un service pour le gérer individuellement)${NC}"
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez une option: ${NC})" choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option: ${NC}")" choice
 
         case "$choice" in
             [0-9]*)
@@ -240,7 +240,7 @@ menu_hl7_management() {
             s|S)
                 echo ""
                 echo -e "${RED}⚠️  Arrêt de tous les services HL7...${NC}"
-                read -p "$(echo -e ${YELLOW}Confirmer l arrêt de tous les services HL7? [o/N]: ${NC})" confirm
+                read -p "$(echo -e "${YELLOW}Confirmer l arrêt de tous les services HL7? [o/N]: ${NC}")" confirm
                 if [[ "$confirm" =~ ^[Oo]$ ]]; then
                     for svc in "${services[@]}"; do
                         echo -e "${YELLOW}→ Stop: $svc${NC}"
@@ -285,7 +285,7 @@ menu_single_hl7_service() {
         echo -e "${WHITE}└─────────────────────────────────────────────────────────────┘${NC}"
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [0-4]: ${NC})" choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option [0-4]: ${NC}")" choice
 
         case "$choice" in
             1)
@@ -377,7 +377,7 @@ menu_proftpd() {
             echo -e "${WHITE}│  ${WHITE}0. Retour                                                │${NC}"
             echo -e "${WHITE}└─────────────────────────────────────────────────────────────┘${NC}"
             echo ""
-            read -p "$(echo -e ${CYAN}Sélectionnez une option: ${NC})" choice
+            read -p "$(echo -e "${CYAN}Sélectionnez une option: ${NC}")" choice
             [[ "$choice" == "0" ]] && break
             continue
         fi
@@ -392,7 +392,7 @@ menu_proftpd() {
         echo -e "${WHITE}└─────────────────────────────────────────────────────────────┘${NC}"
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [0-5]: ${NC})" choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option [0-5]: ${NC}")" choice
 
         case "$choice" in
             1)
@@ -412,7 +412,7 @@ menu_proftpd() {
             3)
                 echo ""
                 echo -e "${RED}⚠️  Arrêt de ProFTPD (connexions FTP interrompues)${NC}"
-                read -p "$(echo -e ${YELLOW}Confirmer? [o/N]: ${NC})" confirm
+                read -p "$(echo -e "${YELLOW}Confirmer? [o/N]: ${NC}")" confirm
                 if [[ "$confirm" =~ ^[Oo]$ ]]; then
                     service_action "proftpd" "stop"
                     log_action "ProFTPD Stop" "INFO" "Mode: $mode"
@@ -526,7 +526,7 @@ menu_services() {
         echo -e "${WHITE}└─────────────────────────────────────────────────────────────┘${NC}"
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [0-3]: ${NC})" choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option [0-3]: ${NC}")" choice
 
         case "$choice" in
             1) menu_hl7_management ;;

@@ -77,7 +77,7 @@ main() {
         show_main_menu
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [0-5]: ${NC})" choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option [0-5]: ${NC}")" choice
 
         case "$choice" in
             1)

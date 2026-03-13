@@ -454,7 +454,7 @@ menu_system() {
         echo ""
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [0-5]: ${NC})" choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option [0-5]: ${NC}")" choice
 
         case "$choice" in
             1) show_system_info ;;

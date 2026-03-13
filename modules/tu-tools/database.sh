@@ -96,7 +96,7 @@ execute_sql_query() {
 
     local port_opt=$(_mysql_port_opt)
 
-    read -p "$(echo -e ${CYAN}Requête SQL: ${NC})" sql_query
+    read -p "$(echo -e "${CYAN}Requête SQL: ${NC}")" sql_query
 
     if [[ -n "$sql_query" ]]; then
         mysql -h "$DB_HOST" $port_opt -u "$DB_USER" -p"$DB_PASSWORD" -e "$sql_query" "$DB_DATABASE" 2>/dev/null || {
@@ -141,11 +141,11 @@ restore_database() {
     ls -lh "$BACKUP_DIR"/*.sql 2>/dev/null || echo "Aucun backup trouvé"
     echo ""
 
-    read -p "$(echo -e ${CYAN}Fichier à restaurer: ${NC})" backup_file
+    read -p "$(echo -e "${CYAN}Fichier à restaurer: ${NC}")" backup_file
 
     if [[ -f "$backup_file" ]]; then
         echo -e "${RED}⚠️  Cette opération va écraser la base!${NC}"
-        read -p "$(echo -e ${YELLOW}Continuer? [o/N]: ${NC})" confirm
+        read -p "$(echo -e "${YELLOW}Continuer? [o/N]: ${NC}")" confirm
 
         if [[ "$confirm" =~ ^[Oo]$ ]]; then
             mysql -h "$DB_HOST" $port_opt -u "$DB_USER" -p"$DB_PASSWORD" "$DB_DATABASE" < "$backup_file" 2>/dev/null && {

@@ -96,7 +96,7 @@ print_section_title() {
 # Fonction ask_confirmation
 ask_confirmation() {
     local question="$1"
-    read -p "$(echo -e ${YELLOW}$question [o/N]: ${NC})" response
+    read -p "$(echo -e "${YELLOW}$question [o/N]: ${NC}")" response
     [[ "$response" =~ ^[Oo]$ ]]
 }
 

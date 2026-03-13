@@ -199,7 +199,7 @@ flush_swap() {
         echo -e "  ${CYAN}2.${NC} Purger partiellement (drop caches d'abord)"
         echo -e "  ${CYAN}0.${NC} Annuler"
         echo ""
-        read -p "$(echo -e ${CYAN}Choix [0-2]: ${NC})" force_choice
+        read -p "$(echo -e "${CYAN}Choix [0-2]: ${NC}")" force_choice
 
         case "$force_choice" in
             1)
@@ -311,7 +311,7 @@ configure_swappiness() {
     echo -e "  ${CYAN}0.${NC} Annuler"
     echo ""
 
-    read -p "$(echo -e ${CYAN}Choix [0-4]: ${NC})" choice
+    read -p "$(echo -e "${CYAN}Choix [0-4]: ${NC}")" choice
 
     local new_value=""
     case "$choice" in
@@ -319,7 +319,7 @@ configure_swappiness() {
         2) new_value=30 ;;
         3) new_value=60 ;;
         4)
-            read -p "$(echo -e ${CYAN}Valeur [0-100]: ${NC})" new_value
+            read -p "$(echo -e "${CYAN}Valeur [0-100]: ${NC}")" new_value
             if ! [[ "$new_value" =~ ^[0-9]+$ ]] || [[ $new_value -gt 100 ]]; then
                 echo -e "${RED}Valeur invalide${NC}"
                 pause_any_key
@@ -378,7 +378,7 @@ drop_system_caches() {
     echo -e "  ${CYAN}0.${NC} Annuler"
     echo ""
 
-    read -p "$(echo -e ${CYAN}Choix [0-3]: ${NC})" choice
+    read -p "$(echo -e "${CYAN}Choix [0-3]: ${NC}")" choice
 
     case "$choice" in
         1|2|3)
@@ -456,7 +456,7 @@ menu_memory_swap() {
         echo -e "${WHITE}└─────────────────────────────────────────────────────────────┘${NC}"
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [0-5]: ${NC})" choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option [0-5]: ${NC}")" choice
 
         case "$choice" in
             1) show_memory_detail ;;
@@ -697,7 +697,7 @@ menu_disk_cleanup() {
         echo -e "${WHITE}└─────────────────────────────────────────────────────────────┘${NC}"
         echo ""
 
-        read -p "$(echo -e ${CYAN}Choix: ${NC})" choice
+        read -p "$(echo -e "${CYAN}Choix: ${NC}")" choice
 
         case "$choice" in
             [1-7])
@@ -850,7 +850,7 @@ show_large_files() {
     echo -e "  ${CYAN}0.${NC} Retour"
     echo ""
 
-    read -p "$(echo -e ${CYAN}Choix [0-5]: ${NC})" choice
+    read -p "$(echo -e "${CYAN}Choix [0-5]: ${NC}")" choice
 
     local search_path=""
     case "$choice" in
@@ -859,7 +859,7 @@ show_large_files() {
         3) search_path="/tmp" ;;
         4) search_path="/" ;;
         5)
-            read -p "$(echo -e ${CYAN}Chemin: ${NC})" search_path
+            read -p "$(echo -e "${CYAN}Chemin: ${NC}")" search_path
             if [[ ! -d "$search_path" ]]; then
                 echo -e "${RED}Répertoire introuvable${NC}"
                 pause_any_key
@@ -1000,7 +1000,7 @@ menu_disk_space() {
         echo -e "${WHITE}└─────────────────────────────────────────────────────────────┘${NC}"
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [0-3]: ${NC})" choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option [0-3]: ${NC}")" choice
 
         case "$choice" in
             1) menu_disk_cleanup ;;
@@ -1032,7 +1032,7 @@ menu_depannage() {
         echo -e "${WHITE}└─────────────────────────────────────────────────────────────┘${NC}"
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [0-2]: ${NC})" choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option [0-2]: ${NC}")" choice
 
         case "$choice" in
             1) menu_memory_swap ;;

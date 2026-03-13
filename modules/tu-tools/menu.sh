@@ -59,7 +59,7 @@ menu_tu_tools() {
         echo -e "${WHITE}└─────────────────────────────────────────────────────────────┘${NC}"
         echo ""
 
-        read -p "$(echo -e ${CYAN}Sélectionnez une option [0-9]: ${NC})" choice
+        read -p "$(echo -e "${CYAN}Sélectionnez une option [0-9]: ${NC}")" choice
 
         case "$choice" in
             1) test_db_connection ;;
