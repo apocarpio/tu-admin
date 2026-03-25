@@ -1,15 +1,15 @@
 #!/bin/bash
 # TU Tools - Configuration
 
-# Fonction pour sauvegarder le percorso dell'applicazione TU
+# Fonction pour sauvegarder le chemin de l'application TU
 save_tu_app_path() {
     local app_path="$1"
     echo "TU_APP_PATH=$(encrypt_string "$app_path")" > "$TU_APP_PATH_FILE"
     chmod 600 "$TU_APP_PATH_FILE"
-    echo -e "${GREEN}✅ Percorso applicazione TU salvato con successo!${NC}"
+    echo -e "${GREEN}✅ Chemin application TU sauvegardé avec succès!${NC}"
 }
 
-# Fonction pour charger le percorso dell'applicazione TU
+# Fonction pour charger le chemin de l'application TU
 load_tu_app_path() {
     if [[ -f "$TU_APP_PATH_FILE" ]]; then
         source "$TU_APP_PATH_FILE"
@@ -21,7 +21,7 @@ load_tu_app_path() {
     return 1
 }
 
-# Fonction pour configurer le percorso dell'applicazione TU
+# Fonction pour configurer le chemin de l'application TU
 configure_tu_app_path() {
     echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
     echo -e "${WHITE}        CONFIGURATION CHEMIN APPLICATION TU               ${NC}"
@@ -120,6 +120,7 @@ configure_tu_app_path() {
 }
 
 # Fonction core: lire les paramètres DB depuis un chemin define.xml.php quelconque
+# Extrait les valeurs, teste la connexion, sauvegarde ET charge les variables globales DB_*
 read_db_from_define_xml_path() {
     local define_file="$1"
 
@@ -131,13 +132,13 @@ read_db_from_define_xml_path() {
 
     echo -e "${CYAN}Lecture du fichier define.xml.php...${NC}"
 
-    # Extraire les valeurs des tags XML
-    local mysqlhost=$(grep -oP '<mysqlhost>\K[^<]*' "$define_file" 2>/dev/null)
-    local mysqluser=$(grep -oP '<mysqluser>\K[^<]*' "$define_file" 2>/dev/null)
-    local mysqlpass=$(grep -oP '<mysqlpass>\K[^<]*' "$define_file" 2>/dev/null)
-    local basegts=$(grep -oP '<basegts>\K[^<]*' "$define_file" 2>/dev/null)
+    # Extraire les valeurs des tags XML (supporte espaces autour des valeurs)
+    local mysqlhost=$(grep -oP '<mysqlhost>\s*\K[^<\s]+' "$define_file" 2>/dev/null)
+    local mysqluser=$(grep -oP '<mysqluser>\s*\K[^<\s]+' "$define_file" 2>/dev/null)
+    local mysqlpass=$(grep -oP '<mysqlpass>\s*\K[^<\s]+' "$define_file" 2>/dev/null)
+    local basegts=$(grep -oP '<basegts>\s*\K[^<\s]+' "$define_file" 2>/dev/null)
     # Port optionnel (tag <mysqlport> - défaut 3306 si absent)
-    local mysqlport=$(grep -oP '<mysqlport>\K[^<]*' "$define_file" 2>/dev/null)
+    local mysqlport=$(grep -oP '<mysqlport>\s*\K[^<\s]+' "$define_file" 2>/dev/null)
     mysqlport="${mysqlport:-3306}"
 
     # Vérifier que tous les paramètres obligatoires ont été trouvés
@@ -159,13 +160,13 @@ read_db_from_define_xml_path() {
     echo -e "${YELLOW}  Base: ${basegts}${NC}"
     echo ""
 
-    # Test de connexion
+    # Test de connexion (utilise MYSQL_PWD pour ne pas exposer le mdp dans ps)
     echo -e "${YELLOW}Test de connexion...${NC}"
     local port_arg=""
     [[ "$mysqlport" != "3306" ]] && port_arg="-P $mysqlport"
 
     if command -v mysql &> /dev/null; then
-        if mysql -h "$mysqlhost" $port_arg -u "$mysqluser" -p"$mysqlpass" -e "USE $basegts;" 2>/dev/null; then
+        if MYSQL_PWD="$mysqlpass" mysql -h "$mysqlhost" $port_arg -u "$mysqluser" -e "USE $basegts;" 2>/dev/null; then
             echo -e "${GREEN}✅ Connexion réussie!${NC}"
         else
             echo -e "${RED}❌ Erreur de connexion avec les paramètres du fichier!${NC}"
@@ -177,6 +178,16 @@ read_db_from_define_xml_path() {
 
     # Sauvegarder les credentials (avec port)
     save_db_credentials "$mysqlhost" "$basegts" "$mysqluser" "$mysqlpass" "$mysqlport"
+
+    # FIX: Charger immédiatement les variables globales DB_*
+    # Avant ce fix, les variables restaient vides après l'appel
+    DB_HOST="$mysqlhost"
+    DB_DATABASE="$basegts"
+    DB_USER="$mysqluser"
+    DB_PASSWORD="$mysqlpass"
+    DB_PORT="$mysqlport"
+    export DB_PORT
+
     return 0
 }
 
@@ -195,10 +206,12 @@ configure_database() {
     echo -e "${YELLOW}Configuration de la connexion à la base de données MySQL/MariaDB${NC}"
     echo ""
 
-    # Construire la liste des options disponibili
+    # Construire la liste des options disponibles
     echo -e "${BLUE}Options de configuration:${NC}"
 
+    local has_tu_define=false
     if [[ -n "$TU_APP_PATH" && -f "$TU_APP_PATH/src/terminal/var/define.xml.php" ]]; then
+        has_tu_define=true
         echo -e "${WHITE}1.${NC} Lire depuis define.xml.php ${GREEN}(chemin App TU - recommandé)${NC}"
         echo -e "${WHITE}2.${NC} Lire depuis define.xml.php ${CYAN}(chemin personnalisé)${NC}"
         echo -e "${WHITE}3.${NC} Configuration manuelle ${YELLOW}(serveur externe / cluster)${NC}"
@@ -209,16 +222,19 @@ configure_database() {
         echo -e "${WHITE}2.${NC} Configuration manuelle ${YELLOW}(serveur externe / cluster)${NC}"
         echo ""
         read -p "$(echo -e "${CYAN}Sélectionnez une option [1-2]: ${NC}")" config_choice
-        # Décaler les choix si TU_APP_PATH non défini
-        [[ "$config_choice" == "1" ]] && config_choice="2"
-        [[ "$config_choice" == "2" ]] && config_choice="3"
+        # FIX: Décaler avec elif pour éviter le double-shift (1→2→3)
+        # Avant: deux [[ ]] séquentiels causaient 1→2 puis 2→3
+        if [[ "$config_choice" == "1" ]]; then
+            config_choice="2"
+        elif [[ "$config_choice" == "2" ]]; then
+            config_choice="3"
+        fi
     fi
 
     case "$config_choice" in
         1)
             # define.xml.php depuis TU_APP_PATH
             if read_db_from_define_xml; then
-                load_db_credentials
                 sleep 2
                 return 0
             else
@@ -241,7 +257,6 @@ configure_database() {
             fi
 
             if read_db_from_define_xml_path "$custom_define_path"; then
-                load_db_credentials
                 sleep 2
                 return 0
             else
@@ -281,7 +296,7 @@ configure_database() {
 
     echo -e "${YELLOW}Test de connexion vers ${db_host}:${db_port}...${NC}"
     if command -v mysql &> /dev/null; then
-        if mysql -h "$db_host" $port_arg -u "$db_user" -p"$db_password" -e "USE $db_name;" 2>/dev/null; then
+        if MYSQL_PWD="$db_password" mysql -h "$db_host" $port_arg -u "$db_user" -e "USE $db_name;" 2>/dev/null; then
             echo -e "${GREEN}✅ Connexion réussie!${NC}"
         else
             echo -e "${YELLOW}⚠️  Impossible de tester la connexion (vérifiez les paramètres)${NC}"
@@ -298,22 +313,20 @@ configure_database() {
 
 # Fonction pour vérifier la configuration DB
 check_database_configuration() {
-    # Se i credentials sono già caricati, va bene
+    # Si les credentials sont déjà chargés, c'est bon
     if load_db_credentials; then
         return 0
     fi
 
-    # Se non ci sono credentials, proviamo a leggere da define.xml.php se l'app TU è configurata
+    # Si pas de credentials, essayer de lire depuis define.xml.php si l'app TU est configurée
     if [[ -n "$TU_APP_PATH" && -f "$TU_APP_PATH/src/terminal/var/define.xml.php" ]]; then
-        echo -e "${CYAN}Tentativo di lettura automatica des paramètres DB depuis define.xml.php...${NC}"
+        echo -e "${CYAN}Tentative de lecture automatique des paramètres DB depuis define.xml.php...${NC}"
         if read_db_from_define_xml; then
-            # Ricaricare i credentials appena salvati
-            load_db_credentials
             return 0
         fi
     fi
 
-    # Se tutto fallisce, chiediamo la configurazione manuale
+    # Si tout échoue, demander la configuration manuelle
     echo -e "${YELLOW}⚠️  Configuration base de données requise!${NC}"
     read -p "$(echo -e "${CYAN}Configurer maintenant? [O/n]: ${NC}")" configure_now
 
