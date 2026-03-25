@@ -52,3 +52,5 @@ data/*
 .db_credentials
 .tu_app_path
 .claude/
+# Releases (archives tar.gz pour installation offline)
+releases/*.tar.gz
